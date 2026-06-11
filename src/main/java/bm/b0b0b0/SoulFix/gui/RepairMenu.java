@@ -69,7 +69,9 @@ public final class RepairMenu implements InventoryHolder {
         this.economyManager = economyManager;
         this.totalSlots = totalSlots;
         this.actions = GuiLayoutHelper.actionBySlot(config.gui());
-        Component title = messageService.guiText(player, config.gui().repairTitleKey);
+        long cooldownSeconds = cooldownService.remainingSeconds(player.getUniqueId(), profile.cooldownUntilEpochMs());
+        String[] pairs = guiPairs(profile, cooldownSeconds);
+        Component title = messageService.guiText(player, config.gui().repairTitleKey, pairs);
         this.inventory = Bukkit.createInventory(this, config.gui().repairSize, title);
         render(profile);
     }
@@ -339,6 +341,7 @@ public final class RepairMenu implements InventoryHolder {
                 "base_slots", String.valueOf(slotService.baseSlots(player)),
                 "purchased_slots", String.valueOf(profile.purchasedSlots()),
                 "total_slots", String.valueOf(totalSlots),
+                "cooldown_remaining", cooldownSeconds <= 0 ? "нет" : cooldownSeconds + "с"
         };
     }
 
