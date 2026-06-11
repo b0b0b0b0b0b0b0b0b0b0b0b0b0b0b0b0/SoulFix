@@ -1,0 +1,37 @@
+name: SoulFix
+version: '${version}'
+main: bm.b0b0b0.soulFix.SoulFix
+api-version: '1.21'
+authors: [ b0b0b0 ]
+softdepend: [ PlaceholderAPI, PlayerPoints, Vault ]
+commands:
+  soulfix:
+    description: SoulFix repair menu
+    usage: /soulfix [slots|admin]
+permissions:
+  soulfix.use:
+    description: Open repair menu
+    default: true
+  soulfix.admin:
+    description: Admin commands
+    default: op
+  soulfix.bypass.cooldown:
+    description: Bypass repair cooldown
+    default: op
+  soulfix.slots.default:
+    description: 1 repair slot
+    default: true
+  soulfix.slots.vip:
+    description: 2 repair slots
+    default: false
+  soulfix.slots.premium:
+    description: 3 repair slots
+    default: false
+  soulfix.slots.legend:
+    description: 5 repair slots
+    default: false
+libraries:
+  - net.elytrium:serializer:1.1.1
+  - com.zaxxer:HikariCP:5.1.0
+  - org.xerial:sqlite-jdbc:3.46.1.3
+  - com.mysql:mysql-connector-j:8.4.0
