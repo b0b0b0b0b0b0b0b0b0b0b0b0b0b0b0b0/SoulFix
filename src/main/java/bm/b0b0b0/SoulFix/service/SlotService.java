@@ -4,14 +4,17 @@ import bm.b0b0b0.SoulFix.config.PluginConfig;
 import bm.b0b0b0.SoulFix.model.PlayerRepairProfile;
 import bm.b0b0b0.SoulFix.repository.PlayerProfileRepository;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.entity.Player;
 
 public final class SlotService {
 
     private final PluginConfig config;
     private final PlayerProfileRepository repository;
+    private final Map<UUID, PlayerRepairProfile> profileCache = new ConcurrentHashMap<>();
 
     public SlotService(PluginConfig config, PlayerProfileRepository repository) {
         this.config = config;
@@ -48,9 +51,22 @@ public final class SlotService {
         return Math.min(config.repairGridSlotCount(), baseSlots(player) + profile.purchasedSlots());
     }
 
+    public Optional<PlayerRepairProfile> cachedProfile(UUID playerId) {
+        return Optional.ofNullable(profileCache.get(playerId));
+    }
+
+    public void warmCache(UUID playerId) {
+        if (!profileCache.containsKey(playerId)) {
+            profile(playerId);
+        }
+    }
+
     public CompletableFuture<PlayerRepairProfile> profile(UUID playerId) {
-        return repository.find(playerId).thenApply(optional -> optional.orElseGet(() ->
-                new PlayerRepairProfile(playerId, 0, 0L)));
+        return repository.find(playerId).thenApply(optional -> {
+            PlayerRepairProfile profile = optional.orElseGet(() -> new PlayerRepairProfile(playerId, 0, 0L));
+            profileCache.put(playerId, profile);
+            return profile;
+        });
     }
 
     public CompletableFuture<Integer> totalSlots(Player player) {
@@ -65,12 +81,23 @@ public final class SlotService {
     public CompletableFuture<PlayerRepairProfile> addPurchasedSlots(UUID playerId, int amount, int cap) {
         return profile(playerId).thenCompose(profile -> {
             int next = Math.min(cap, Math.max(0, profile.purchasedSlots() + amount));
-            return repository.save(profile.withPurchasedSlots(next));
+            return repository.save(profile.withPurchasedSlots(next)).thenApply(saved -> {
+                profileCache.put(playerId, saved);
+                return saved;
+            });
         });
     }
 
     public CompletableFuture<PlayerRepairProfile> setPurchasedSlots(UUID playerId, int amount) {
         return profile(playerId).thenCompose(profile -> repository.save(
-                profile.withPurchasedSlots(Math.min(config.repairGridSlotCount(), Math.max(0, amount)))));
+                profile.withPurchasedSlots(Math.min(config.repairGridSlotCount(), Math.max(0, amount)))
+        ).thenApply(saved -> {
+            profileCache.put(playerId, saved);
+            return saved;
+        }));
+    }
+
+    public void updateCache(PlayerRepairProfile profile) {
+        profileCache.put(profile.playerId(), profile);
     }
 }

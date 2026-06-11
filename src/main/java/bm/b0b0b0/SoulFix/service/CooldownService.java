@@ -54,10 +54,18 @@ public final class CooldownService {
 
     public CompletableFuture<PlayerRepairProfile> applyCooldown(UUID playerId, int itemCount) {
         long until = System.currentTimeMillis() + durationSeconds(itemCount) * 1000L;
-        return slotService.profile(playerId).thenCompose(profile -> repository.save(profile.withCooldownUntil(until)));
+        return slotService.profile(playerId).thenCompose(profile -> repository.save(profile.withCooldownUntil(until))
+                .thenApply(saved -> {
+                    slotService.updateCache(saved);
+                    return saved;
+                }));
     }
 
     public CompletableFuture<PlayerRepairProfile> resetCooldown(UUID playerId) {
-        return slotService.profile(playerId).thenCompose(profile -> repository.save(profile.withCooldownUntil(0L)));
+        return slotService.profile(playerId).thenCompose(profile -> repository.save(profile.withCooldownUntil(0L))
+                .thenApply(saved -> {
+                    slotService.updateCache(saved);
+                    return saved;
+                }));
     }
 }

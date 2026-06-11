@@ -22,13 +22,13 @@ permissions:
     description: 1 repair slot
     default: true
   soulfix.slots.vip:
-    description: 2 repair slots
+    description: VIP base slots + purchase limit tier
     default: false
   soulfix.slots.premium:
-    description: 3 repair slots
+    description: Premium base slots + purchase limit tier
     default: false
   soulfix.slots.legend:
-    description: 5 repair slots
+    description: Legend base slots + purchase limit tier
     default: false
 libraries:
   - net.elytrium:serializer:1.1.1

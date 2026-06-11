@@ -4,6 +4,7 @@ import bm.b0b0b0.SoulFix.config.PluginConfig;
 import bm.b0b0b0.SoulFix.gui.RepairMenu;
 import bm.b0b0b0.SoulFix.message.MessageService;
 import bm.b0b0b0.SoulFix.service.RepairItemValidator;
+import bm.b0b0b0.SoulFix.service.RepairService;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,6 +14,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -23,11 +25,18 @@ public final class RepairInventoryListener implements Listener {
     private final PluginConfig config;
     private final RepairItemValidator validator;
     private final MessageService messageService;
+    private final RepairService repairService;
 
-    public RepairInventoryListener(PluginConfig config, RepairItemValidator validator, MessageService messageService) {
+    public RepairInventoryListener(
+            PluginConfig config,
+            RepairItemValidator validator,
+            MessageService messageService,
+            RepairService repairService
+    ) {
         this.config = config;
         this.validator = validator;
         this.messageService = messageService;
+        this.repairService = repairService;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -72,6 +81,11 @@ public final class RepairInventoryListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        repairService.cleanupOnQuit(event.getPlayer());
+    }
+
     private void handleRepairClick(InventoryClickEvent event, RepairMenu menu) {
         if (menu.isAnimating()) {
             event.setCancelled(true);
@@ -102,20 +116,23 @@ public final class RepairInventoryListener implements Listener {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
                     || event.getClick() == ClickType.SHIFT_LEFT
                     || event.getClick() == ClickType.SHIFT_RIGHT) {
-                ItemStack moving = event.getCurrentItem();
-                if (moving != null && !moving.getType().isAir()) {
-                    if (!validator.isRepairable(moving)) {
-                        event.setCancelled(true);
-                        rejectPlacement(event.getWhoClicked(), moving);
-                        return;
-                    }
-                    if (!menu.hasEmptyEditableSlot()) {
-                        event.setCancelled(true);
-                        if (event.getWhoClicked() instanceof Player player) {
-                            messageService.send(player, "repair.slots-full");
-                        }
-                    }
+                event.setCancelled(true);
+                if (!(event.getWhoClicked() instanceof Player player)) {
+                    return;
                 }
+                ItemStack moving = event.getCurrentItem();
+                if (moving == null || moving.getType().isAir()) {
+                    return;
+                }
+                if (!validator.isRepairable(moving)) {
+                    rejectPlacement(player, moving);
+                    return;
+                }
+                if (!menu.hasEmptyEditableSlot()) {
+                    messageService.send(player, "repair.slots-full");
+                    return;
+                }
+                menu.shiftInsert(moving);
             }
         }
     }

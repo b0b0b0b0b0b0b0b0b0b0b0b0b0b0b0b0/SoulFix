@@ -125,7 +125,7 @@ public final class SoulFixCommandRegistrar {
         if (!requireReady(context.getSource().getSender())) {
             return 0;
         }
-        Player target = resolvePlayer(context);
+        Player target = resolvePlayer(context, context.getSource().getSender());
         if (target == null) {
             return 0;
         }
@@ -150,7 +150,7 @@ public final class SoulFixCommandRegistrar {
         if (!requireReady(context.getSource().getSender())) {
             return 0;
         }
-        Player target = resolvePlayer(context);
+        Player target = resolvePlayer(context, context.getSource().getSender());
         if (target == null) {
             return 0;
         }
@@ -173,7 +173,7 @@ public final class SoulFixCommandRegistrar {
         if (!requireReady(context.getSource().getSender())) {
             return 0;
         }
-        Player target = resolvePlayer(context);
+        Player target = resolvePlayer(context, context.getSource().getSender());
         if (target == null) {
             return 0;
         }
@@ -200,8 +200,12 @@ public final class SoulFixCommandRegistrar {
         return false;
     }
 
-    private Player resolvePlayer(CommandContext<CommandSourceStack> context) {
+    private Player resolvePlayer(CommandContext<CommandSourceStack> context, CommandSender sender) {
         String name = StringArgumentType.getString(context, "player");
-        return Bukkit.getPlayerExact(name);
+        Player target = Bukkit.getPlayerExact(name);
+        if (target == null) {
+            messageService.send(sender, "admin.player-not-found", "player", name);
+        }
+        return target;
     }
 }

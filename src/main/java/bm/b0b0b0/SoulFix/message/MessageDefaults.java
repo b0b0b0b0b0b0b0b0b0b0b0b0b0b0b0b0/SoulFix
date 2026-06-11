@@ -75,6 +75,7 @@ public final class MessageDefaults {
         messages.put("slots.purchase-success", "&#55FF55Куплено &#FFFFFF{amount} &#55FF55сл. Итого: &#FFFFFF{purchased_slots}/{max_purchased} &#7F7F7F(доступно &#FFFFFF{total_slots}&#7F7F7F)");
         messages.put("slots.not-enough-points", "&#FF5555Не хватает {currency}. Нужно: &#FFFFFF{cost}");
         messages.put("slots.shop-unavailable", "&#FF5555Покупка недоступна. Экономика: &#FFFFFF{provider}");
+        messages.put("slots.purchase-failed", "&#FF5555Ошибка покупки. Средства возвращены — попробуй снова.");
 
         messages.put("repair.cooldown", "&#FF5555Подожди &#FFFFFF{seconds} &#FF5555сек.");
         messages.put("repair.no-items", "&#FF5555Нет сломанных предметов в слотах.");
@@ -88,6 +89,7 @@ public final class MessageDefaults {
         messages.put("admin.giveslots", "&#55FF55Выдано &#FFFFFF{amount} &#55FF55слотов → &#FFFFFF{player}");
         messages.put("admin.removeslots", "&#55FF55Снято &#FFFFFF{amount} &#55FF55слотов у &#FFFFFF{player}");
         messages.put("admin.resetcooldown", "&#55FF55Кулдаун сброшен: &#FFFFFF{player}");
+        messages.put("admin.player-not-found", "&#FF5555Игрок не в сети: &#FFFFFF{player}");
         messages.put("admin.usage", "&#FFAA00/soulfix admin <giveslots|removeslots|resetcooldown|reload> ...");
 
         messages.put("error.database", "&#FF5555База данных не готова. Подожди секунду.");
@@ -161,6 +163,7 @@ public final class MessageDefaults {
         messages.put("slots.purchase-success", "&#55FF55Bought &#FFFFFF{amount} &#55FF55slots. Total: &#FFFFFF{purchased_slots}/{max_purchased} &#7F7F7F(available &#FFFFFF{total_slots}&#7F7F7F)");
         messages.put("slots.not-enough-points", "&#FF5555Not enough {currency}. Need: &#FFFFFF{cost}");
         messages.put("slots.shop-unavailable", "&#FF5555Shop unavailable. Economy: &#FFFFFF{provider}");
+        messages.put("slots.purchase-failed", "&#FF5555Purchase failed. Funds refunded — try again.");
 
         messages.put("repair.cooldown", "&#FF5555Wait &#FFFFFF{seconds} &#FF5555sec.");
         messages.put("repair.no-items", "&#FF5555No damaged items in slots.");
@@ -174,6 +177,7 @@ public final class MessageDefaults {
         messages.put("admin.giveslots", "&#55FF55Gave &#FFFFFF{amount} &#55FF55slots → &#FFFFFF{player}");
         messages.put("admin.removeslots", "&#55FF55Removed &#FFFFFF{amount} &#55FF55slots from &#FFFFFF{player}");
         messages.put("admin.resetcooldown", "&#55FF55Cooldown reset: &#FFFFFF{player}");
+        messages.put("admin.player-not-found", "&#FF5555Player not online: &#FFFFFF{player}");
         messages.put("admin.usage", "&#FFAA00/soulfix admin <giveslots|removeslots|resetcooldown|reload> ...");
 
         messages.put("error.database", "&#FF5555Database not ready. Wait a moment.");

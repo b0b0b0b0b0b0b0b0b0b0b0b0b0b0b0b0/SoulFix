@@ -50,6 +50,11 @@ public final class PlayerPointsEconomyProvider implements EconomyProvider {
     }
 
     @Override
+    public boolean deposit(UUID playerId, double amount) {
+        return api != null && api.give(playerId, (int) amount);
+    }
+
+    @Override
     public String currencyLabel() {
         return currencyLabel;
     }

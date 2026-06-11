@@ -115,6 +115,13 @@ public final class SlotEconomyManager {
         return active.withdraw(playerId, cost);
     }
 
+    public boolean refund(java.util.UUID playerId, int alreadyPurchased, int slotAmount) {
+        if (!isShopAvailable()) {
+            return false;
+        }
+        return active.deposit(playerId, chargeAmount(alreadyPurchased, slotAmount));
+    }
+
     public boolean hasFunds(java.util.UUID playerId, int alreadyPurchased, int slotAmount) {
         return isShopAvailable() && active.has(playerId, chargeAmount(alreadyPurchased, slotAmount));
     }

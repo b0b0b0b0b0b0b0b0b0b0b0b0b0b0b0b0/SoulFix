@@ -39,6 +39,7 @@ public final class RepairService {
     }
 
     public void returnSecuredToPlayer(Player player) {
+        animationService.cancel(player.getUniqueId());
         List<ItemStack> items = securedItems.remove(player.getUniqueId());
         if (items == null || items.isEmpty()) {
             return;
@@ -49,8 +50,20 @@ public final class RepairService {
         messageService.send(player, "repair.returned");
     }
 
+    public void cleanupOnQuit(Player player) {
+        animationService.cancel(player.getUniqueId());
+        List<ItemStack> items = securedItems.remove(player.getUniqueId());
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+        for (ItemStack itemStack : items) {
+            giveToPlayer(player, itemStack);
+        }
+    }
+
     public void startRepair(Player player, List<ItemStack> items, Runnable onStart, Runnable onComplete, Runnable onAbort) {
-        if (isAnimating(player.getUniqueId())) {
+        UUID playerId = player.getUniqueId();
+        if (isAnimating(playerId)) {
             messageService.send(player, "repair.in-progress");
             runOnMain(onAbort);
             return;
@@ -59,6 +72,9 @@ public final class RepairService {
             if (onCooldown) {
                 cooldownService.remainingSecondsAsync(player).thenAccept(seconds ->
                         runOnMain(() -> {
+                            if (!player.isOnline()) {
+                                return;
+                            }
                             messageService.send(player, "repair.cooldown", "seconds", String.valueOf(seconds));
                             if (onAbort != null) {
                                 onAbort.run();
@@ -74,6 +90,9 @@ public final class RepairService {
             }
             if (repairable.isEmpty()) {
                 runOnMain(() -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
                     messageService.send(player, "repair.no-items");
                     if (onAbort != null) {
                         onAbort.run();
@@ -82,21 +101,36 @@ public final class RepairService {
                 return;
             }
             runOnMain(() -> {
-                securedItems.put(player.getUniqueId(), cloneAll(repairable));
+                if (!player.isOnline()) {
+                    if (onAbort != null) {
+                        onAbort.run();
+                    }
+                    return;
+                }
+                if (isAnimating(playerId)) {
+                    messageService.send(player, "repair.in-progress");
+                    if (onAbort != null) {
+                        onAbort.run();
+                    }
+                    return;
+                }
+                securedItems.put(playerId, cloneAll(repairable));
                 if (onStart != null) {
                     onStart.run();
                 }
                 animationService.play(player, () -> {
                     finishRepair(player);
-                    if (onComplete != null) {
-                        onComplete.run();
-                    }
+                    runOnMain(onComplete);
                 });
             });
         });
     }
 
     private void finishRepair(Player player) {
+        if (!player.isOnline()) {
+            securedItems.remove(player.getUniqueId());
+            return;
+        }
         List<ItemStack> secured = securedItems.remove(player.getUniqueId());
         if (secured == null || secured.isEmpty()) {
             return;

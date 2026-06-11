@@ -6,8 +6,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,7 +14,6 @@ public final class DataSourceProvider {
     private final HikariDataSource dataSource;
 
     public DataSourceProvider(JavaPlugin plugin, PluginConfig config) {
-        Logger.getLogger("com.zaxxer.hikari").setLevel(Level.WARNING);
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setPoolName("SoulFix");
         hikariConfig.setMaximumPoolSize(config.storage().poolSize);

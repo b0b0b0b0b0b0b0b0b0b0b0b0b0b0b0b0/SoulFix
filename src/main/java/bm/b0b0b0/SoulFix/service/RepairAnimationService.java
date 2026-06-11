@@ -4,6 +4,9 @@ import bm.b0b0b0.SoulFix.config.PluginConfig;
 import bm.b0b0b0.SoulFix.config.settings.SoulFixSettings;
 import bm.b0b0b0.SoulFix.message.MessageService;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -18,6 +21,8 @@ public final class RepairAnimationService {
     private final JavaPlugin plugin;
     private final PluginConfig config;
     private final MessageService messageService;
+    private final Map<UUID, BukkitTask> activeTasks = new ConcurrentHashMap<>();
+    private final Map<UUID, BossBar> activeBossBars = new ConcurrentHashMap<>();
 
     public RepairAnimationService(JavaPlugin plugin, PluginConfig config, MessageService messageService) {
         this.plugin = plugin;
@@ -26,6 +31,8 @@ public final class RepairAnimationService {
     }
 
     public void play(Player player, Runnable onComplete) {
+        UUID playerId = player.getUniqueId();
+        cancel(playerId);
         SoulFixSettings.AnimationSettings animation = config.animation();
         int duration = Math.max(1, animation.durationTicks);
         BossBar bossBar = null;
@@ -37,6 +44,7 @@ public final class RepairAnimationService {
                     parseStyle(animation.bossBarStyle)
             );
             player.showBossBar(bossBar);
+            activeBossBars.put(playerId, bossBar);
         }
         BossBar finalBossBar = bossBar;
         BukkitTask[] holder = new BukkitTask[1];
@@ -45,6 +53,10 @@ public final class RepairAnimationService {
 
             @Override
             public void run() {
+                if (!player.isOnline()) {
+                    cancel(playerId);
+                    return;
+                }
                 tick++;
                 float progress = Math.min(1.0f, tick / (float) duration);
                 spawnEffects(player, animation);
@@ -59,16 +71,26 @@ public final class RepairAnimationService {
                     finalBossBar.progress(progress);
                 }
                 if (tick >= duration) {
-                    if (holder[0] != null) {
-                        holder[0].cancel();
-                    }
-                    if (finalBossBar != null) {
-                        player.hideBossBar(finalBossBar);
-                    }
+                    cancel(playerId);
                     onComplete.run();
                 }
             }
         }, 0L, 1L);
+        activeTasks.put(playerId, holder[0]);
+    }
+
+    public void cancel(UUID playerId) {
+        BukkitTask task = activeTasks.remove(playerId);
+        if (task != null) {
+            task.cancel();
+        }
+        BossBar bossBar = activeBossBars.remove(playerId);
+        if (bossBar != null) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player != null && player.isOnline()) {
+                player.hideBossBar(bossBar);
+            }
+        }
     }
 
     private void spawnEffects(Player player, SoulFixSettings.AnimationSettings animation) {

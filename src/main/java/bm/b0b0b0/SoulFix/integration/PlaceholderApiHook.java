@@ -53,19 +53,31 @@ public final class PlaceholderApiHook extends PlaceholderExpansion {
             return "";
         }
         UUID playerId = player.getUniqueId();
+        slotService.warmCache(playerId);
         return switch (params.toLowerCase()) {
             case "base_slots" -> player.isOnline() && player.getPlayer() != null
                     ? String.valueOf(slotService.baseSlots(player.getPlayer()))
                     : "0";
-            case "purchased_slots" -> String.valueOf(slotService.profile(playerId).join().purchasedSlots());
+            case "purchased_slots" -> String.valueOf(slotService.cachedProfile(playerId)
+                    .map(profile -> profile.purchasedSlots())
+                    .orElse(0));
             case "max_purchased_slots" -> player.isOnline() && player.getPlayer() != null
                     ? String.valueOf(slotService.maxPurchasableSlots(player.getPlayer()))
                     : "0";
-            case "total_slots" -> player.isOnline() && player.getPlayer() != null
-                    ? String.valueOf(slotService.totalSlots(player.getPlayer()).join())
-                    : String.valueOf(slotService.profile(playerId).join().purchasedSlots());
+            case "total_slots" -> {
+                if (player.isOnline() && player.getPlayer() instanceof Player online) {
+                    yield String.valueOf(slotService.cachedProfile(playerId)
+                            .map(profile -> slotService.totalSlots(online, profile))
+                            .orElse(slotService.baseSlots(online)));
+                }
+                yield String.valueOf(slotService.cachedProfile(playerId)
+                        .map(profile -> profile.purchasedSlots())
+                        .orElse(0));
+            }
             case "cooldown" -> {
-                long until = slotService.profile(playerId).join().cooldownUntilEpochMs();
+                long until = slotService.cachedProfile(playerId)
+                        .map(profile -> profile.cooldownUntilEpochMs())
+                        .orElse(0L);
                 yield String.valueOf(cooldownService.remainingSeconds(playerId, until));
             }
             default -> "";

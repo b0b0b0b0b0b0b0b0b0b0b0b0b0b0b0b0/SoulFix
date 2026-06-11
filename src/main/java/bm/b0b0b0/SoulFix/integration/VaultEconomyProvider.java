@@ -50,6 +50,11 @@ public final class VaultEconomyProvider implements EconomyProvider {
         return economy != null && economy.withdrawPlayer(offline(playerId), amount).transactionSuccess();
     }
 
+    @Override
+    public boolean deposit(UUID playerId, double amount) {
+        return economy != null && economy.depositPlayer(offline(playerId), amount).transactionSuccess();
+    }
+
     public String vaultCurrencyLabelOr(String fallback) {
         if (economy != null) {
             String plural = economy.currencyNamePlural();

@@ -17,6 +17,8 @@ public interface EconomyProvider {
 
     boolean withdraw(UUID playerId, double amount);
 
+    boolean deposit(UUID playerId, double amount);
+
     String currencyLabel();
 
     default OfflinePlayer offline(UUID playerId) {

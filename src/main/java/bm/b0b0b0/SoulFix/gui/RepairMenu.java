@@ -94,13 +94,26 @@ public final class RepairMenu implements InventoryHolder {
     }
 
     public boolean hasEmptyEditableSlot() {
+        return firstEmptyEditableSlot() >= 0;
+    }
+
+    public int firstEmptyEditableSlot() {
         for (int slot : editableSlots) {
             ItemStack itemStack = inventory.getItem(slot);
             if (itemStack == null || itemStack.getType().isAir()) {
-                return true;
+                return slot;
             }
         }
-        return false;
+        return -1;
+    }
+
+    public void shiftInsert(ItemStack source) {
+        int slot = firstEmptyEditableSlot();
+        if (slot < 0 || source == null || source.getType().isAir()) {
+            return;
+        }
+        inventory.setItem(slot, source.clone());
+        source.setAmount(0);
     }
 
     public String actionAt(int slot) {

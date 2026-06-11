@@ -19,6 +19,7 @@ import bm.b0b0b0.SoulFix.service.RepairItemValidator;
 import bm.b0b0b0.SoulFix.service.RepairService;
 import bm.b0b0b0.SoulFix.service.SlotPurchaseService;
 import bm.b0b0b0.SoulFix.service.SlotService;
+import bm.b0b0b0.SoulFix.database.DataSourceProvider;
 import bm.b0b0b0.SoulFix.util.PluginConsole;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,17 +29,13 @@ public final class SoulFix extends JavaPlugin {
     private ConfigurationLoader configurationLoader;
     private MessageService messageService;
     private DatabaseBootstrap databaseBootstrap;
-    private bm.b0b0b0.SoulFix.SoulFixRuntime runtime;
+    private SoulFixRuntime runtime;
     private SlotEconomyManager economyManager;
     private PlaceholderApiHook placeholderApiHook;
 
     @Override
     public void onEnable() {
         PluginConsole.startupHeader(getPluginMeta().getVersion());
-
-        if (!getDataFolder().exists() && !getDataFolder().mkdirs()) {
-            PluginConsole.warn("Could not create plugin data folder");
-        }
 
         configurationLoader = new ConfigurationLoader();
         PluginConfig pluginConfig = configurationLoader.load(this);
@@ -57,7 +54,7 @@ public final class SoulFix extends JavaPlugin {
         economyManager = new SlotEconomyManager(pluginConfig);
         logEconomyStatus(economyManager.hook());
 
-        runtime = new bm.b0b0b0.SoulFix.SoulFixRuntime();
+        runtime = new SoulFixRuntime();
         new SoulFixCommandRegistrar(this, pluginConfig, messageService, runtime, configurationLoader).register();
         PluginConsole.step("Commands registered (/soulfix)");
 
@@ -75,7 +72,7 @@ public final class SoulFix extends JavaPlugin {
         });
     }
 
-    private void finishEnable(PluginConfig pluginConfig, bm.b0b0b0.SoulFix.database.DataSourceProvider provider) {
+    private void finishEnable(PluginConfig pluginConfig, DataSourceProvider provider) {
         SqlPlayerProfileRepository repository = new SqlPlayerProfileRepository(
                 provider.dataSource(),
                 databaseBootstrap.executor()
@@ -119,14 +116,14 @@ public final class SoulFix extends JavaPlugin {
         if (pluginConfig.placeholderApiEnabled()) {
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 placeholderApiHook.registerIfPresent();
-                PluginConsole.step("PlaceholderAPI hooked (%soulfix_base_slots%, %soulfix_total_slots%, %soulfix_cooldown%)");
+                PluginConsole.step("PlaceholderAPI hooked");
             } else {
                 PluginConsole.warn("PlaceholderAPI not found — placeholders disabled");
             }
         }
 
         getServer().getPluginManager().registerEvents(
-                new RepairInventoryListener(pluginConfig, repairItemValidator, messageService),
+                new RepairInventoryListener(pluginConfig, repairItemValidator, messageService, repairService),
                 this
         );
         PluginConsole.step("Listeners registered");
