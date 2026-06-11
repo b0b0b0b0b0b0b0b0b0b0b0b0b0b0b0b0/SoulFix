@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.database;
+package bm.b0b0b0.SoulFix.database;
 
 import java.sql.Connection;
 import java.sql.SQLException;

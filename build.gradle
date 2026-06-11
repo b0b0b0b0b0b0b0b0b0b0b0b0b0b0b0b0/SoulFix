@@ -3,7 +3,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
-group = 'bm.b0b0b0.soulFix'
+group = 'bm.b0b0b0.SoulFix'
 version = '1.0'
 
 repositories {

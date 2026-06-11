@@ -1,6 +1,6 @@
 name: SoulFix
 version: '${version}'
-main: bm.b0b0b0.soulFix.SoulFix
+main: bm.b0b0b0.SoulFix.SoulFix
 api-version: '1.21'
 authors: [ b0b0b0 ]
 softdepend: [ PlaceholderAPI, PlayerPoints, Vault ]

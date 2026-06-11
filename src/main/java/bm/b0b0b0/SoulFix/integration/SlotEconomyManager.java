@@ -1,6 +1,6 @@
-package bm.b0b0b0.soulFix.integration;
+package bm.b0b0b0.SoulFix.integration;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
 import java.util.Locale;
 public final class SlotEconomyManager {
 

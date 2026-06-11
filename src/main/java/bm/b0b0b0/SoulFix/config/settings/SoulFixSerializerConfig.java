@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.config.settings;
+package bm.b0b0b0.SoulFix.config.settings;
 
 import net.elytrium.serializer.SerializerConfig;
 

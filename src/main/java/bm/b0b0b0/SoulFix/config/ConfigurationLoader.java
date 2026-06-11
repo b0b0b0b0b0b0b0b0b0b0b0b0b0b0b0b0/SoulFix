@@ -1,7 +1,7 @@
-package bm.b0b0b0.soulFix.config;
+package bm.b0b0b0.SoulFix.config;
 
-import bm.b0b0b0.soulFix.config.settings.GuiFixSettings;
-import bm.b0b0b0.soulFix.config.settings.SoulFixSettings;
+import bm.b0b0b0.SoulFix.config.settings.GuiFixSettings;
+import bm.b0b0b0.SoulFix.config.settings.SoulFixSettings;
 import java.nio.file.Path;
 import org.bukkit.plugin.java.JavaPlugin;
 

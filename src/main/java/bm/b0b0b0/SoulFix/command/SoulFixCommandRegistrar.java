@@ -1,9 +1,9 @@
-package bm.b0b0b0.soulFix.command;
+package bm.b0b0b0.SoulFix.command;
 
-import bm.b0b0b0.soulFix.SoulFixRuntime;
-import bm.b0b0b0.soulFix.config.ConfigurationLoader;
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.SoulFixRuntime;
+import bm.b0b0b0.SoulFix.config.ConfigurationLoader;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.message.MessageService;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;

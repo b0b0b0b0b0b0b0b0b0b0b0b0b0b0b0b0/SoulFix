@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.config.settings;
+package bm.b0b0b0.SoulFix.config.settings;
 
 import java.util.LinkedHashMap;
 import java.util.List;

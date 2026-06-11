@@ -1,7 +1,7 @@
-package bm.b0b0b0.soulFix.integration;
+package bm.b0b0b0.SoulFix.integration;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.config.settings.SoulFixSettings;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.config.settings.SoulFixSettings;
 
 public final class SlotPurchasePricing {
 

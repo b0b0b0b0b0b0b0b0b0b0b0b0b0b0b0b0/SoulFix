@@ -1,12 +1,12 @@
-package bm.b0b0b0.soulFix.gui;
+package bm.b0b0b0.SoulFix.gui;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.integration.SlotEconomyManager;
-import bm.b0b0b0.soulFix.message.MessageService;
-import bm.b0b0b0.soulFix.service.CooldownService;
-import bm.b0b0b0.soulFix.service.RepairService;
-import bm.b0b0b0.soulFix.service.SlotPurchaseService;
-import bm.b0b0b0.soulFix.service.SlotService;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.integration.SlotEconomyManager;
+import bm.b0b0b0.SoulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.service.CooldownService;
+import bm.b0b0b0.SoulFix.service.RepairService;
+import bm.b0b0b0.SoulFix.service.SlotPurchaseService;
+import bm.b0b0b0.SoulFix.service.SlotService;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

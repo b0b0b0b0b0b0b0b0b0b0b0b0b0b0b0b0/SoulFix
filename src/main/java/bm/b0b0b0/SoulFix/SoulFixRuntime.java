@@ -1,8 +1,8 @@
-package bm.b0b0b0.soulFix;
+package bm.b0b0b0.SoulFix;
 
-import bm.b0b0b0.soulFix.gui.RepairGuiService;
-import bm.b0b0b0.soulFix.service.CooldownService;
-import bm.b0b0b0.soulFix.service.SlotService;
+import bm.b0b0b0.SoulFix.gui.RepairGuiService;
+import bm.b0b0b0.SoulFix.service.CooldownService;
+import bm.b0b0b0.SoulFix.service.SlotService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SoulFixRuntime {

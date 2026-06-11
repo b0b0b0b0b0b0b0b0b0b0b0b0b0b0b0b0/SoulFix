@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.integration;
+package bm.b0b0b0.SoulFix.integration;
 
 import java.util.UUID;
 import org.bukkit.OfflinePlayer;

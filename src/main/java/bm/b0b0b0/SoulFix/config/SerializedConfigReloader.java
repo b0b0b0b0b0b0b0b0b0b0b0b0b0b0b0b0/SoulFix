@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.config;
+package bm.b0b0b0.SoulFix.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,8 +1,8 @@
-package bm.b0b0b0.soulFix.service;
+package bm.b0b0b0.SoulFix.service;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.model.PlayerRepairProfile;
-import bm.b0b0b0.soulFix.repository.PlayerProfileRepository;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.model.PlayerRepairProfile;
+import bm.b0b0b0.SoulFix.repository.PlayerProfileRepository;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

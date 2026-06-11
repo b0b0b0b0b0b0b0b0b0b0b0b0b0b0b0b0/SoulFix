@@ -1,7 +1,7 @@
-package bm.b0b0b0.soulFix.integration;
+package bm.b0b0b0.SoulFix.integration;
 
-import bm.b0b0b0.soulFix.service.CooldownService;
-import bm.b0b0b0.soulFix.service.SlotService;
+import bm.b0b0b0.SoulFix.service.CooldownService;
+import bm.b0b0b0.SoulFix.service.SlotService;
 import java.util.UUID;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;

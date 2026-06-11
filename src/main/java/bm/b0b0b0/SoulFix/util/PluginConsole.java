@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.util;
+package bm.b0b0b0.SoulFix.util;
 
 import org.bukkit.Bukkit;
 

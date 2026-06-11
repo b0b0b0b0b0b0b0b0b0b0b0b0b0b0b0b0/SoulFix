@@ -1,9 +1,9 @@
-package bm.b0b0b0.soulFix.listener;
+package bm.b0b0b0.SoulFix.listener;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.gui.RepairMenu;
-import bm.b0b0b0.soulFix.message.MessageService;
-import bm.b0b0b0.soulFix.service.RepairItemValidator;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.gui.RepairMenu;
+import bm.b0b0b0.SoulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.service.RepairItemValidator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

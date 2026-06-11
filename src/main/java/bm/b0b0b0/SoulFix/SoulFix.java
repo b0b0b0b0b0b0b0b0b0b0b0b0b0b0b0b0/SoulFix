@@ -1,25 +1,25 @@
-package bm.b0b0b0.soulFix;
+package bm.b0b0b0.SoulFix;
 
-import bm.b0b0b0.soulFix.command.SoulFixCommandRegistrar;
-import bm.b0b0b0.soulFix.config.ConfigurationLoader;
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.database.DatabaseBootstrap;
-import bm.b0b0b0.soulFix.gui.GuiItemFactory;
-import bm.b0b0b0.soulFix.gui.RepairGuiService;
-import bm.b0b0b0.soulFix.integration.EconomyHookStatus;
-import bm.b0b0b0.soulFix.integration.PlaceholderApiHook;
-import bm.b0b0b0.soulFix.integration.SlotEconomyManager;
-import bm.b0b0b0.soulFix.listener.RepairInventoryListener;
-import bm.b0b0b0.soulFix.message.MessageLoader;
-import bm.b0b0b0.soulFix.message.MessageService;
-import bm.b0b0b0.soulFix.repository.SqlPlayerProfileRepository;
-import bm.b0b0b0.soulFix.service.CooldownService;
-import bm.b0b0b0.soulFix.service.RepairAnimationService;
-import bm.b0b0b0.soulFix.service.RepairItemValidator;
-import bm.b0b0b0.soulFix.service.RepairService;
-import bm.b0b0b0.soulFix.service.SlotPurchaseService;
-import bm.b0b0b0.soulFix.service.SlotService;
-import bm.b0b0b0.soulFix.util.PluginConsole;
+import bm.b0b0b0.SoulFix.command.SoulFixCommandRegistrar;
+import bm.b0b0b0.SoulFix.config.ConfigurationLoader;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.database.DatabaseBootstrap;
+import bm.b0b0b0.SoulFix.gui.GuiItemFactory;
+import bm.b0b0b0.SoulFix.gui.RepairGuiService;
+import bm.b0b0b0.SoulFix.integration.EconomyHookStatus;
+import bm.b0b0b0.SoulFix.integration.PlaceholderApiHook;
+import bm.b0b0b0.SoulFix.integration.SlotEconomyManager;
+import bm.b0b0b0.SoulFix.listener.RepairInventoryListener;
+import bm.b0b0b0.SoulFix.message.MessageLoader;
+import bm.b0b0b0.SoulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.repository.SqlPlayerProfileRepository;
+import bm.b0b0b0.SoulFix.service.CooldownService;
+import bm.b0b0b0.SoulFix.service.RepairAnimationService;
+import bm.b0b0b0.SoulFix.service.RepairItemValidator;
+import bm.b0b0b0.SoulFix.service.RepairService;
+import bm.b0b0b0.SoulFix.service.SlotPurchaseService;
+import bm.b0b0b0.SoulFix.service.SlotService;
+import bm.b0b0b0.SoulFix.util.PluginConsole;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,7 +28,7 @@ public final class SoulFix extends JavaPlugin {
     private ConfigurationLoader configurationLoader;
     private MessageService messageService;
     private DatabaseBootstrap databaseBootstrap;
-    private bm.b0b0b0.soulFix.SoulFixRuntime runtime;
+    private bm.b0b0b0.SoulFix.SoulFixRuntime runtime;
     private SlotEconomyManager economyManager;
     private PlaceholderApiHook placeholderApiHook;
 
@@ -57,7 +57,7 @@ public final class SoulFix extends JavaPlugin {
         economyManager = new SlotEconomyManager(pluginConfig);
         logEconomyStatus(economyManager.hook());
 
-        runtime = new bm.b0b0b0.soulFix.SoulFixRuntime();
+        runtime = new bm.b0b0b0.SoulFix.SoulFixRuntime();
         new SoulFixCommandRegistrar(this, pluginConfig, messageService, runtime, configurationLoader).register();
         PluginConsole.step("Commands registered (/soulfix)");
 
@@ -75,7 +75,7 @@ public final class SoulFix extends JavaPlugin {
         });
     }
 
-    private void finishEnable(PluginConfig pluginConfig, bm.b0b0b0.soulFix.database.DataSourceProvider provider) {
+    private void finishEnable(PluginConfig pluginConfig, bm.b0b0b0.SoulFix.database.DataSourceProvider provider) {
         SqlPlayerProfileRepository repository = new SqlPlayerProfileRepository(
                 provider.dataSource(),
                 databaseBootstrap.executor()

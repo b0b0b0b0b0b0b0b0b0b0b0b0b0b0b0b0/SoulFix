@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.message;
+package bm.b0b0b0.SoulFix.message;
 
 import java.io.IOException;
 import java.io.InputStream;

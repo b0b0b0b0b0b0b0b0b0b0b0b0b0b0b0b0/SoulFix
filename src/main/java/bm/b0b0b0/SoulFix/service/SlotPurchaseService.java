@@ -1,7 +1,7 @@
-package bm.b0b0b0.soulFix.service;
+package bm.b0b0b0.SoulFix.service;
 
-import bm.b0b0b0.soulFix.integration.SlotEconomyManager;
-import bm.b0b0b0.soulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.integration.SlotEconomyManager;
+import bm.b0b0b0.SoulFix.message.MessageService;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

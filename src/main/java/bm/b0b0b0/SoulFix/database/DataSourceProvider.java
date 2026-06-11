@@ -1,6 +1,6 @@
-package bm.b0b0b0.soulFix.database;
+package bm.b0b0b0.SoulFix.database;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;

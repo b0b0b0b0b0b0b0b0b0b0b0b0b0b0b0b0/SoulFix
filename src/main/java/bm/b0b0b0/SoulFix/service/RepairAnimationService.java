@@ -1,8 +1,8 @@
-package bm.b0b0b0.soulFix.service;
+package bm.b0b0b0.SoulFix.service;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
-import bm.b0b0b0.soulFix.config.settings.SoulFixSettings;
-import bm.b0b0b0.soulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.config.settings.SoulFixSettings;
+import bm.b0b0b0.SoulFix.message.MessageService;
 import java.util.Locale;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;

@@ -1,4 +1,4 @@
-package bm.b0b0b0.soulFix.model;
+package bm.b0b0b0.SoulFix.model;
 
 import java.util.UUID;
 

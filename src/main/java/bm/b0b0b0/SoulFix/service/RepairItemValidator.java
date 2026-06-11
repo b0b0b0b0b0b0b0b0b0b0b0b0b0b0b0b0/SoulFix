@@ -1,6 +1,6 @@
-package bm.b0b0b0.soulFix.service;
+package bm.b0b0b0.SoulFix.service;
 
-import bm.b0b0b0.soulFix.config.PluginConfig;
+import bm.b0b0b0.SoulFix.config.PluginConfig;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;

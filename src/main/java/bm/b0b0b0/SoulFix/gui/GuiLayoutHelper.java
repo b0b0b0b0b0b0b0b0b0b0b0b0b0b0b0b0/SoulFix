@@ -1,6 +1,6 @@
-package bm.b0b0b0.soulFix.gui;
+package bm.b0b0b0.SoulFix.gui;
 
-import bm.b0b0b0.soulFix.config.settings.GuiFixSettings;
+import bm.b0b0b0.SoulFix.config.settings.GuiFixSettings;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

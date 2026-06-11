@@ -1,7 +1,7 @@
-package bm.b0b0b0.soulFix.gui;
+package bm.b0b0b0.SoulFix.gui;
 
-import bm.b0b0b0.soulFix.config.settings.GuiFixSettings;
-import bm.b0b0b0.soulFix.message.MessageService;
+import bm.b0b0b0.SoulFix.config.settings.GuiFixSettings;
+import bm.b0b0b0.SoulFix.message.MessageService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
