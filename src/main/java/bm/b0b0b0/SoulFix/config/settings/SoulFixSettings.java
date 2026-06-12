@@ -43,6 +43,14 @@ public final class SoulFixSettings extends YamlSerializable {
     public AnimationSettings animation = new AnimationSettings();
 
     @NewLine
+    @Comment({
+            @CommentValue("=== Празднование покупки слота ==="),
+            @CommentValue("title/actionbar/bossbar — ключи в lang/*.yml"),
+            @CommentValue("sounds / potion-effects / firework-colors — настраиваются здесь")
+    })
+    public PurchaseCelebrationSettings purchaseCelebration = new PurchaseCelebrationSettings();
+
+    @NewLine
     public IntegrationsSettings integrations = new IntegrationsSettings();
 
     public static final class StorageSettings {
@@ -151,6 +159,85 @@ public final class SoulFixSettings extends YamlSerializable {
         public String bossBarColor = "GREEN";
         public String bossBarStyle = "SEGMENTED_10";
         public String bossBarTitleKey = "animation.bossbar";
+    }
+
+    public static final class PurchaseCelebrationSettings {
+        public boolean enabled = true;
+        public boolean chatEnabled = true;
+
+        public boolean titleEnabled = false;
+        public int titleFadeInTicks = 10;
+        public int titleStayTicks = 70;
+        public int titleFadeOutTicks = 20;
+        public String titleKey = "purchase-celebration.title";
+        public String subtitleKey = "purchase-celebration.subtitle";
+
+        public boolean actionBarEnabled = true;
+        public String actionBarKey = "purchase-celebration.actionbar";
+
+        public boolean bossBarEnabled = true;
+        public int durationTicks = 60;
+        public String bossBarKey = "purchase-celebration.bossbar";
+        public String bossBarColor = "YELLOW";
+        public String bossBarStyle = "NOTCHED_20";
+
+        public boolean particlesEnabled = true;
+        public int particleIntervalTicks = 1;
+        public String particle = "TOTEM_OF_UNDYING";
+        public int particleCount = 16;
+        public double particleOffset = 0.15;
+        public double particleSpeed = 0.02;
+        public double particleRadius = 1.4;
+        public double particleSpin = 18.0;
+        public boolean risingParticles = true;
+        public double riseHeight = 2.5;
+
+        public float soundVolume = 1.0f;
+        public float soundPitch = 1.15f;
+        public List<String> sounds = defaultCelebrationSounds();
+
+        public List<PotionEffectSettings> potionEffects = defaultCelebrationPotions();
+
+        public boolean fireworkEnabled = true;
+        public List<String> fireworkColors = List.of("YELLOW", "ORANGE", "RED");
+
+        public static final class PotionEffectSettings {
+            public boolean enabled = true;
+            public String type = "GLOWING";
+            public int durationTicks = 100;
+            public int amplifier = 0;
+            public boolean showParticles = false;
+            public boolean showIcon = true;
+        }
+    }
+
+    private static List<String> defaultCelebrationSounds() {
+        return List.of(
+                "UI_TOAST_CHALLENGE_COMPLETE",
+                "ENTITY_PLAYER_LEVELUP",
+                "BLOCK_BEACON_ACTIVATE"
+        );
+    }
+
+    private static List<PurchaseCelebrationSettings.PotionEffectSettings> defaultCelebrationPotions() {
+        PurchaseCelebrationSettings.PotionEffectSettings glow =
+                new PurchaseCelebrationSettings.PotionEffectSettings();
+        glow.type = "GLOWING";
+        glow.durationTicks = 100;
+
+        PurchaseCelebrationSettings.PotionEffectSettings levitation =
+                new PurchaseCelebrationSettings.PotionEffectSettings();
+        levitation.type = "LEVITATION";
+        levitation.durationTicks = 18;
+        levitation.amplifier = 0;
+
+        PurchaseCelebrationSettings.PotionEffectSettings speed =
+                new PurchaseCelebrationSettings.PotionEffectSettings();
+        speed.type = "SPEED";
+        speed.durationTicks = 80;
+        speed.amplifier = 0;
+
+        return List.of(glow, levitation, speed);
     }
 
     public static final class IntegrationsSettings {

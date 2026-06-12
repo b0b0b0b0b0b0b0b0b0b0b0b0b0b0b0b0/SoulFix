@@ -17,6 +17,7 @@ import bm.b0b0b0.SoulFix.service.CooldownService;
 import bm.b0b0b0.SoulFix.service.RepairAnimationService;
 import bm.b0b0b0.SoulFix.service.RepairItemValidator;
 import bm.b0b0b0.SoulFix.service.RepairService;
+import bm.b0b0b0.SoulFix.service.SlotPurchaseCelebrationService;
 import bm.b0b0b0.SoulFix.service.SlotPurchaseService;
 import bm.b0b0b0.SoulFix.service.SlotService;
 import bm.b0b0b0.SoulFix.database.DataSourceProvider;
@@ -83,6 +84,8 @@ public final class SoulFix extends JavaPlugin {
         CooldownService cooldownService = new CooldownService(pluginConfig, repository, slotService);
         RepairItemValidator repairItemValidator = new RepairItemValidator(pluginConfig);
         RepairAnimationService repairAnimationService = new RepairAnimationService(this, pluginConfig, messageService);
+        SlotPurchaseCelebrationService purchaseCelebrationService =
+                new SlotPurchaseCelebrationService(this, pluginConfig, messageService);
         RepairService repairService = new RepairService(
                 this,
                 cooldownService,
@@ -97,7 +100,8 @@ public final class SoulFix extends JavaPlugin {
                 this,
                 slotService,
                 economyManager,
-                messageService
+                messageService,
+                purchaseCelebrationService
         );
 
         RepairGuiService repairGuiService = new RepairGuiService(
@@ -123,7 +127,13 @@ public final class SoulFix extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(
-                new RepairInventoryListener(pluginConfig, repairItemValidator, messageService, repairService),
+                new RepairInventoryListener(
+                        pluginConfig,
+                        repairItemValidator,
+                        messageService,
+                        repairService,
+                        purchaseCelebrationService
+                ),
                 this
         );
         PluginConsole.step("Listeners registered");

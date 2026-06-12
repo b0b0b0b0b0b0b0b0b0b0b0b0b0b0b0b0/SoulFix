@@ -136,6 +136,10 @@ public final class PluginConfig {
         return main.animation;
     }
 
+    public SoulFixSettings.PurchaseCelebrationSettings purchaseCelebration() {
+        return main.purchaseCelebration;
+    }
+
     public boolean placeholderApiEnabled() {
         return main.integrations.placeholderApiEnabled;
     }

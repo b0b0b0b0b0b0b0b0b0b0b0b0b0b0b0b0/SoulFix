@@ -79,6 +79,11 @@ public final class MessageDefaults {
         messages.put("slots.shop-unavailable", "&#FF5555Покупка недоступна. Экономика: &#FFFFFF{provider}");
         messages.put("slots.purchase-failed", "&#FF5555Ошибка покупки. Средства возвращены — попробуй снова.");
 
+        messages.put("purchase-celebration.title", "&#FFD700✦ ВЛАДЕЛЕЦ МИРА ✦");
+        messages.put("purchase-celebration.subtitle", "&#55FF55+{amount} слота &#7F7F7F| &#FFFFFF{total_slots} &#AAAAAAдоступно");
+        messages.put("purchase-celebration.actionbar", "&#BB55FFТвоё пространство починки расширено!");
+        messages.put("purchase-celebration.bossbar", "&#FFD700Величие &#FFFFFF{purchased_slots}&#7F7F7F/&#FFFFFF{max_purchased} &#AAAAAA| &#FFFFFF{cost} {currency}");
+
         messages.put("repair.cooldown", "&#FF5555Подожди &#FFFFFF{seconds} &#FF5555сек.");
         messages.put("repair.no-items", "&#FF5555Нет сломанных предметов в слотах.");
         messages.put("repair.slots-full", "&#FF5555Все доступные слоты заняты.");
@@ -181,6 +186,11 @@ public final class MessageDefaults {
         messages.put("slots.not-enough-points", "&#FF5555Not enough {currency}. Need: &#FFFFFF{cost}");
         messages.put("slots.shop-unavailable", "&#FF5555Shop unavailable. Economy: &#FFFFFF{provider}");
         messages.put("slots.purchase-failed", "&#FF5555Purchase failed. Funds refunded — try again.");
+
+        messages.put("purchase-celebration.title", "&#FFD700✦ MASTER OF THE REALM ✦");
+        messages.put("purchase-celebration.subtitle", "&#55FF55+{amount} slots &#7F7F7F| &#FFFFFF{total_slots} &#AAAAAAavailable");
+        messages.put("purchase-celebration.actionbar", "&#BB55FFYour repair space has expanded!");
+        messages.put("purchase-celebration.bossbar", "&#FFD700Glory &#FFFFFF{purchased_slots}&#7F7F7F/&#FFFFFF{max_purchased} &#AAAAAA| &#FFFFFF{cost} {currency}");
 
         messages.put("repair.cooldown", "&#FF5555Wait &#FFFFFF{seconds} &#FF5555sec.");
         messages.put("repair.no-items", "&#FF5555No damaged items in slots.");

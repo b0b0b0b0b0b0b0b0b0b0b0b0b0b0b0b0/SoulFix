@@ -17,18 +17,21 @@ public final class SlotPurchaseService {
     private final SlotService slotService;
     private final SlotEconomyManager economyManager;
     private final MessageService messageService;
+    private final SlotPurchaseCelebrationService celebrationService;
     private final Set<UUID> purchasing = ConcurrentHashMap.newKeySet();
 
     public SlotPurchaseService(
             JavaPlugin plugin,
             SlotService slotService,
             SlotEconomyManager economyManager,
-            MessageService messageService
+            MessageService messageService,
+            SlotPurchaseCelebrationService celebrationService
     ) {
         this.plugin = plugin;
         this.slotService = slotService;
         this.economyManager = economyManager;
         this.messageService = messageService;
+        this.celebrationService = celebrationService;
     }
 
     public boolean isShopAvailable() {
@@ -112,19 +115,9 @@ public final class SlotPurchaseService {
                 }
                 int chargedFrom = purchased;
                 int chargedAmount = actual;
+                String formattedCost = economyManager.formatCost(cost);
                 return slotService.addPurchasedSlots(player, actual).thenApply(saved -> {
-                    notify(
-                            player,
-                            "slots.purchase-success",
-                            "amount",
-                            String.valueOf(chargedAmount),
-                            "purchased_slots",
-                            String.valueOf(saved.purchasedSlots()),
-                            "max_purchased",
-                            String.valueOf(slotService.maxBuyableSlots(player)),
-                            "total_slots",
-                            String.valueOf(slotService.totalSlots(player, saved))
-                    );
+                    deliverSuccess(player, chargedAmount, saved, formattedCost);
                     return true;
                 }).exceptionally(throwable -> {
                     Bukkit.getScheduler().runTask(plugin, () ->
@@ -137,6 +130,37 @@ public final class SlotPurchaseService {
             notify(player, "error.database");
             return false;
         }).whenComplete((result, throwable) -> purchasing.remove(playerId));
+    }
+
+    private void deliverSuccess(Player player, int amount, PlayerRepairProfile saved, String formattedCost) {
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            if (celebrationService.settings().chatEnabled) {
+                messageService.send(
+                        player,
+                        "slots.purchase-success",
+                        "amount",
+                        String.valueOf(amount),
+                        "purchased_slots",
+                        String.valueOf(saved.purchasedSlots()),
+                        "max_purchased",
+                        String.valueOf(slotService.maxBuyableSlots(player)),
+                        "total_slots",
+                        String.valueOf(slotService.totalSlots(player, saved))
+                );
+            }
+            celebrationService.celebrate(
+                    player,
+                    amount,
+                    saved.purchasedSlots(),
+                    slotService.maxBuyableSlots(player),
+                    slotService.totalSlots(player, saved),
+                    formattedCost,
+                    economyManager.currencyLabel()
+            );
+        });
     }
 
     private int remainingPurchasable(Player player, int purchased) {

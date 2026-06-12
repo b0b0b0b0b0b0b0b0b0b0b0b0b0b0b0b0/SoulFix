@@ -5,6 +5,7 @@ import bm.b0b0b0.SoulFix.gui.RepairMenu;
 import bm.b0b0b0.SoulFix.message.MessageService;
 import bm.b0b0b0.SoulFix.service.RepairItemValidator;
 import bm.b0b0b0.SoulFix.service.RepairService;
+import bm.b0b0b0.SoulFix.service.SlotPurchaseCelebrationService;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,17 +27,20 @@ public final class RepairInventoryListener implements Listener {
     private final RepairItemValidator validator;
     private final MessageService messageService;
     private final RepairService repairService;
+    private final SlotPurchaseCelebrationService purchaseCelebrationService;
 
     public RepairInventoryListener(
             PluginConfig config,
             RepairItemValidator validator,
             MessageService messageService,
-            RepairService repairService
+            RepairService repairService,
+            SlotPurchaseCelebrationService purchaseCelebrationService
     ) {
         this.config = config;
         this.validator = validator;
         this.messageService = messageService;
         this.repairService = repairService;
+        this.purchaseCelebrationService = purchaseCelebrationService;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -84,6 +88,7 @@ public final class RepairInventoryListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         repairService.cleanupOnQuit(event.getPlayer());
+        purchaseCelebrationService.cancel(event.getPlayer().getUniqueId());
     }
 
     private void handleRepairClick(InventoryClickEvent event, RepairMenu menu) {

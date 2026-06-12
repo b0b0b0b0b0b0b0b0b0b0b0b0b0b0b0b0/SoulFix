@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.CommandSender;
+import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -84,5 +84,29 @@ public final class MessageService {
         for (String line : loader.lore(locale, key)) {
             sender.sendMessage(HexColorParser.parse(line));
         }
+    }
+
+    public void showTitle(
+            Player player,
+            int fadeInTicks,
+            int stayTicks,
+            int fadeOutTicks,
+            String titleKey,
+            String subtitleKey,
+            String... pairs
+    ) {
+        player.showTitle(Title.title(
+                guiText(player, titleKey, pairs),
+                guiText(player, subtitleKey, pairs),
+                Title.Times.times(
+                        java.time.Duration.ofMillis(fadeInTicks * 50L),
+                        java.time.Duration.ofMillis(stayTicks * 50L),
+                        java.time.Duration.ofMillis(fadeOutTicks * 50L)
+                )
+        ));
+    }
+
+    public void showActionBar(Player player, String key, String... pairs) {
+        player.sendActionBar(guiText(player, key, pairs));
     }
 }
