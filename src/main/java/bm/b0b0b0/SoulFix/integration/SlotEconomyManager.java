@@ -126,6 +126,17 @@ public final class SlotEconomyManager {
         return isShopAvailable() && active.has(playerId, chargeAmount(alreadyPurchased, slotAmount));
     }
 
+    public double balance(java.util.UUID playerId) {
+        if (!isShopAvailable()) {
+            return 0.0;
+        }
+        return active.balance(playerId);
+    }
+
+    public String formatBalance(java.util.UUID playerId) {
+        return formatCost(balance(playerId));
+    }
+
     private double chargeAmount(int alreadyPurchased, int slotAmount) {
         double cost = totalCost(alreadyPurchased, slotAmount);
         if (active instanceof PlayerPointsEconomyProvider) {

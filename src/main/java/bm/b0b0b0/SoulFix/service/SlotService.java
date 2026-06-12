@@ -3,6 +3,7 @@ package bm.b0b0b0.SoulFix.service;
 import bm.b0b0b0.SoulFix.config.PluginConfig;
 import bm.b0b0b0.SoulFix.model.PlayerRepairProfile;
 import bm.b0b0b0.SoulFix.repository.PlayerProfileRepository;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,20 +22,23 @@ public final class SlotService {
         this.repository = repository;
     }
 
-    public int baseSlots(Player player) {
-        int max = 0;
-        for (Map.Entry<String, Integer> entry : config.slotTiers().entrySet()) {
-            if (player.hasPermission(entry.getKey())) {
-                max = Math.max(max, entry.getValue());
+    public int unlockedRowCount(Player player) {
+        int count = 1;
+        for (String permission : config.rowUnlockPermissions()) {
+            if (!player.hasPermission(permission)) {
+                break;
             }
+            count++;
         }
-        if (max == 0 && player.hasPermission(config.permissionUse())) {
-            max = 1;
-        }
-        return max;
+        return Math.min(count, config.gui().repairRows.size());
     }
 
-    public int maxPurchasableSlots(Player player) {
+    public boolean isRowUnlocked(Player player, int rowIndex) {
+        int minRowIndex = config.gui().repairRows.size() - unlockedRowCount(player);
+        return rowIndex >= minRowIndex;
+    }
+
+    public int maxBuyableSlots(Player player) {
         int max = 0;
         for (Map.Entry<String, Integer> entry : config.purchaseLimitTiers().entrySet()) {
             if (player.hasPermission(entry.getKey())) {
@@ -42,13 +46,58 @@ public final class SlotService {
             }
         }
         if (max == 0 && player.hasPermission(config.permissionUse())) {
-            max = config.slotRowSize();
+            max = config.purchaseRowBuyCap();
         }
-        return max;
+        return Math.min(max, config.purchaseRowBuyCap());
+    }
+
+    public int freePurchaseRowSlots() {
+        return config.freePurchaseRowSlots();
+    }
+
+    public int unlockedInPurchaseRow(PlayerRepairProfile profile) {
+        return Math.min(
+                config.purchaseRowSlots().size(),
+                config.freePurchaseRowSlots() + Math.max(0, profile.purchasedSlots())
+        );
+    }
+
+    public int unlockedPurchaseSlots(PlayerRepairProfile profile) {
+        return unlockedInPurchaseRow(profile);
+    }
+
+    public int unlockedPermissionRowSlots(Player player) {
+        int minRowIndex = config.gui().repairRows.size() - unlockedRowCount(player);
+        int count = 0;
+        for (int row = minRowIndex; row < config.purchaseRowIndex(); row++) {
+            count += config.repairRow(row).size();
+        }
+        return count;
     }
 
     public int totalSlots(Player player, PlayerRepairProfile profile) {
-        return Math.min(config.repairGridSlotCount(), baseSlots(player) + profile.purchasedSlots());
+        return unlockedPermissionRowSlots(player) + unlockedPurchaseSlots(profile);
+    }
+
+    public String requiredPermissionForRow(int rowIndex) {
+        int purchaseRow = config.purchaseRowIndex();
+        if (rowIndex >= purchaseRow) {
+            return "";
+        }
+        int tiersAboveBase = purchaseRow - rowIndex;
+        List<String> unlocks = config.rowUnlockPermissions();
+        if (tiersAboveBase <= 0 || tiersAboveBase > unlocks.size()) {
+            return "";
+        }
+        return unlocks.get(tiersAboveBase - 1);
+    }
+
+    public String rankLangKeyForRow(int rowIndex) {
+        String permission = requiredPermissionForRow(rowIndex);
+        if (permission.isEmpty()) {
+            return "gui.repair.rank.default";
+        }
+        return config.rowRankKeys().getOrDefault(permission, "gui.repair.rank.default");
     }
 
     public Optional<PlayerRepairProfile> cachedProfile(UUID playerId) {
@@ -74,7 +123,7 @@ public final class SlotService {
     }
 
     public CompletableFuture<PlayerRepairProfile> addPurchasedSlots(Player player, int amount) {
-        int cap = maxPurchasableSlots(player);
+        int cap = maxBuyableSlots(player);
         return addPurchasedSlots(player.getUniqueId(), amount, cap);
     }
 
@@ -89,8 +138,9 @@ public final class SlotService {
     }
 
     public CompletableFuture<PlayerRepairProfile> setPurchasedSlots(UUID playerId, int amount) {
+        int cap = config.purchaseRowBuyCap();
         return profile(playerId).thenCompose(profile -> repository.save(
-                profile.withPurchasedSlots(Math.min(config.repairGridSlotCount(), Math.max(0, amount)))
+                profile.withPurchasedSlots(Math.min(cap, Math.max(0, amount)))
         ).thenApply(saved -> {
             profileCache.put(playerId, saved);
             return saved;

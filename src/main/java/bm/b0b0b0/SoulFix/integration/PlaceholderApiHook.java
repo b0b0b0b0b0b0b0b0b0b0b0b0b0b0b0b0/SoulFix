@@ -55,20 +55,20 @@ public final class PlaceholderApiHook extends PlaceholderExpansion {
         UUID playerId = player.getUniqueId();
         slotService.warmCache(playerId);
         return switch (params.toLowerCase()) {
-            case "base_slots" -> player.isOnline() && player.getPlayer() != null
-                    ? String.valueOf(slotService.baseSlots(player.getPlayer()))
+            case "base_slots", "tier_slots" -> player.isOnline() && player.getPlayer() != null
+                    ? String.valueOf(slotService.unlockedPermissionRowSlots(player.getPlayer()))
                     : "0";
             case "purchased_slots" -> String.valueOf(slotService.cachedProfile(playerId)
                     .map(profile -> profile.purchasedSlots())
                     .orElse(0));
             case "max_purchased_slots" -> player.isOnline() && player.getPlayer() != null
-                    ? String.valueOf(slotService.maxPurchasableSlots(player.getPlayer()))
+                    ? String.valueOf(slotService.maxBuyableSlots(player.getPlayer()))
                     : "0";
             case "total_slots" -> {
                 if (player.isOnline() && player.getPlayer() instanceof Player online) {
                     yield String.valueOf(slotService.cachedProfile(playerId)
                             .map(profile -> slotService.totalSlots(online, profile))
-                            .orElse(slotService.baseSlots(online)));
+                            .orElse(slotService.unlockedPermissionRowSlots(online)));
                 }
                 yield String.valueOf(slotService.cachedProfile(playerId)
                         .map(profile -> profile.purchasedSlots())

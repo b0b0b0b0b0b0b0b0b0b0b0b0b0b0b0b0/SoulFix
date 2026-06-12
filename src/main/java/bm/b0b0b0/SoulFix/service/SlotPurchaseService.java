@@ -121,7 +121,7 @@ public final class SlotPurchaseService {
                             "purchased_slots",
                             String.valueOf(saved.purchasedSlots()),
                             "max_purchased",
-                            String.valueOf(slotService.maxPurchasableSlots(player)),
+                            String.valueOf(slotService.maxBuyableSlots(player)),
                             "total_slots",
                             String.valueOf(slotService.totalSlots(player, saved))
                     );
@@ -140,7 +140,7 @@ public final class SlotPurchaseService {
     }
 
     private int remainingPurchasable(Player player, int purchased) {
-        return Math.max(0, slotService.maxPurchasableSlots(player) - purchased);
+        return Math.max(0, slotService.maxBuyableSlots(player) - purchased);
     }
 
     private void notifyLimit(Player player, int purchased) {
@@ -150,7 +150,7 @@ public final class SlotPurchaseService {
                 "purchased_slots",
                 String.valueOf(purchased),
                 "max_purchased",
-                String.valueOf(slotService.maxPurchasableSlots(player))
+                String.valueOf(slotService.maxBuyableSlots(player))
         );
     }
 

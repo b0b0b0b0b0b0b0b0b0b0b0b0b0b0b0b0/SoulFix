@@ -8,6 +8,9 @@ commands:
   soulfix:
     description: SoulFix repair menu
     usage: /soulfix [slots|admin]
+  repair:
+    description: Open SoulFix repair menu
+    usage: /repair
 permissions:
   soulfix.use:
     description: Open repair menu
@@ -18,17 +21,14 @@ permissions:
   soulfix.bypass.cooldown:
     description: Bypass repair cooldown
     default: op
-  soulfix.slots.default:
-    description: 1 repair slot
-    default: true
   soulfix.slots.vip:
-    description: VIP base slots + purchase limit tier
+    description: Unlock row 28-34 (cumulative, after base row 37-43)
     default: false
   soulfix.slots.premium:
-    description: Premium base slots + purchase limit tier
+    description: Unlock row 19-25 (cumulative)
     default: false
-  soulfix.slots.legend:
-    description: Legend base slots + purchase limit tier
+  soulfix.slots.mvp:
+    description: Unlock row 10-16 (cumulative)
     default: false
 libraries:
   - net.elytrium:serializer:1.1.1

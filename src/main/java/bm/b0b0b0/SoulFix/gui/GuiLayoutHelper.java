@@ -35,7 +35,22 @@ public final class GuiLayoutHelper {
         return actions;
     }
 
-    public static List<Integer> activeRepairSlots(List<Integer> configuredSlots, int allowedCount) {
-        return configuredSlots.stream().limit(Math.max(0, allowedCount)).toList();
+    public static int slotIndexInRow(GuiFixSettings settings, int rowIndex, int inventorySlot) {
+        List<Integer> row = settings.repairRows.get(rowIndex);
+        for (int index = 0; index < row.size(); index++) {
+            if (row.get(index) == inventorySlot) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    public static boolean isRepairGridSlot(GuiFixSettings settings, int inventorySlot) {
+        for (List<Integer> row : settings.repairRows) {
+            if (row.contains(inventorySlot)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

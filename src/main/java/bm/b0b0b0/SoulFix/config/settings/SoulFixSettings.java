@@ -67,15 +67,26 @@ public final class SoulFixSettings extends YamlSerializable {
         public String bypassCooldown = "soulfix.bypass.cooldown";
     }
 
+    @NewLine
+    @Comment({
+            @CommentValue("=== Слоты GUI (снизу вверх) ==="),
+            @CommentValue("Ряд 37–43 — всем (покупка). +28–34, +19–25, +10–16 — по одной ноде в row-unlock-permissions"),
+            @CommentValue("Порядок row-unlock-permissions: сначала VIP-ряд, потом выше, потом ещё выше"),
+            @CommentValue("row-rank-keys: permission → gui.repair.rank.* в lang (название для игрока)"),
+            @CommentValue("gui/general.yml → repair-rows: [10-16], [19-25], [28-34], [37-43] — сверху вниз в файле")
+    })
     public static final class SlotsSettings {
-        @Comment(@CommentValue("Слотов в одном ряду GUI (7×4 = 28 мест)"))
-        public int rowSize = 7;
+        @Comment(@CommentValue("Ноды LuckPerms по одной на каждый ряд ВЫШЕ 37–43 (кумулятивно, снизу вверх)"))
+        public List<String> rowUnlockPermissions = defaultRowUnlockPermissions();
 
-        @Comment(@CommentValue("Открыто изначально без покупки (максимум из совпавших permission)"))
-        public Map<String, Integer> permissionTiers = defaultTiers();
-
-        @Comment(@CommentValue("Сколько слотов можно докупить (максимум из совпавших permission)"))
+        @Comment(@CommentValue("Макс. покупаемых слотов 38–43 (не считая бесплатный 37) по permission"))
         public Map<String, Integer> purchaseLimitTiers = defaultPurchaseLimits();
+
+        @Comment(@CommentValue("Бесплатных слотов в ряду 37–43 без покупки (первый = 37)"))
+        public int freePurchaseRowSlots = 1;
+
+        @Comment(@CommentValue("permission из row-unlock-permissions → ключ lang"))
+        public Map<String, String> rowRankKeys = defaultRowRankKeys();
     }
 
     public static final class EconomySettings {
@@ -146,21 +157,28 @@ public final class SoulFixSettings extends YamlSerializable {
         public boolean placeholderApiEnabled = true;
     }
 
-    private static Map<String, Integer> defaultTiers() {
-        Map<String, Integer> tiers = new LinkedHashMap<>();
-        tiers.put("soulfix.slots.default", 1);
-        tiers.put("soulfix.slots.vip", 3);
-        tiers.put("soulfix.slots.premium", 4);
-        tiers.put("soulfix.slots.legend", 5);
-        return tiers;
+    private static List<String> defaultRowUnlockPermissions() {
+        return List.of(
+                "soulfix.slots.vip",
+                "soulfix.slots.premium",
+                "soulfix.slots.mvp"
+        );
     }
 
     private static Map<String, Integer> defaultPurchaseLimits() {
         Map<String, Integer> limits = new LinkedHashMap<>();
-        limits.put("soulfix.slots.default", 7);
-        limits.put("soulfix.slots.vip", 14);
-        limits.put("soulfix.slots.premium", 21);
-        limits.put("soulfix.slots.legend", 28);
+        limits.put("soulfix.use", 6);
+        limits.put("soulfix.slots.vip", 6);
+        limits.put("soulfix.slots.premium", 6);
+        limits.put("soulfix.slots.mvp", 6);
         return limits;
+    }
+
+    private static Map<String, String> defaultRowRankKeys() {
+        Map<String, String> keys = new LinkedHashMap<>();
+        keys.put("soulfix.slots.vip", "gui.repair.rank.vip");
+        keys.put("soulfix.slots.premium", "gui.repair.rank.premium");
+        keys.put("soulfix.slots.mvp", "gui.repair.rank.mvp");
+        return keys;
     }
 }

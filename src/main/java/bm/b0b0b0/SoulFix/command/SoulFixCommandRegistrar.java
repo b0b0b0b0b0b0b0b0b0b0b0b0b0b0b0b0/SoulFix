@@ -39,29 +39,38 @@ public final class SoulFixCommandRegistrar {
     }
 
     public void register() {
-        plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> event.registrar().register(
-                Commands.literal("soulfix")
-                        .requires(source -> source.getSender().hasPermission(config.permissionUse())
-                                || source.getSender().hasPermission(config.permissionAdmin()))
-                        .executes(this::openMenu)
-                        .then(Commands.literal("slots").executes(this::showSlots))
-                        .then(Commands.literal("admin")
-                                .requires(source -> source.getSender().hasPermission(config.permissionAdmin()))
-                                .executes(this::usage)
-                                .then(Commands.literal("reload").executes(this::reload))
-                                .then(Commands.literal("giveslots")
-                                        .then(Commands.argument("player", StringArgumentType.word())
-                                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
-                                                        .executes(this::giveSlots))))
-                                .then(Commands.literal("removeslots")
-                                        .then(Commands.argument("player", StringArgumentType.word())
-                                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
-                                                        .executes(this::removeSlots))))
-                                .then(Commands.literal("resetcooldown")
-                                        .then(Commands.argument("player", StringArgumentType.word())
-                                                .executes(this::resetCooldown))))
-                        .build()
-        ));
+        var soulfix = Commands.literal("soulfix")
+                .requires(source -> source.getSender().hasPermission(config.permissionUse())
+                        || source.getSender().hasPermission(config.permissionAdmin()))
+                .executes(this::openMenu)
+                .then(Commands.literal("slots").executes(this::showSlots))
+                .then(Commands.literal("admin")
+                        .requires(source -> source.getSender().hasPermission(config.permissionAdmin()))
+                        .executes(this::usage)
+                        .then(Commands.literal("setup").executes(this::setup))
+                        .then(Commands.literal("reload").executes(this::reload))
+                        .then(Commands.literal("giveslots")
+                                .then(Commands.argument("player", StringArgumentType.word())
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                                .executes(this::giveSlots))))
+                        .then(Commands.literal("removeslots")
+                                .then(Commands.argument("player", StringArgumentType.word())
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                                .executes(this::removeSlots))))
+                        .then(Commands.literal("resetcooldown")
+                                .then(Commands.argument("player", StringArgumentType.word())
+                                        .executes(this::resetCooldown))));
+
+        plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            event.registrar().register(soulfix.build());
+            event.registrar().register(
+                    Commands.literal("repair")
+                            .requires(source -> source.getSender().hasPermission(config.permissionUse())
+                                    || source.getSender().hasPermission(config.permissionAdmin()))
+                            .executes(this::openMenu)
+                            .build()
+            );
+        });
     }
 
     private int openMenu(CommandContext<CommandSourceStack> context) {
@@ -91,21 +100,24 @@ public final class SoulFixCommandRegistrar {
             return 0;
         }
         runtime.slotService().profile(player.getUniqueId()).thenAccept(profile -> {
-            int base = runtime.slotService().baseSlots(player);
+            int tier = runtime.slotService().unlockedPermissionRowSlots(player);
             int purchased = profile.purchasedSlots();
-            int maxPurchased = runtime.slotService().maxPurchasableSlots(player);
+            int maxPurchased = runtime.slotService().maxBuyableSlots(player);
             int total = runtime.slotService().totalSlots(player, profile);
+            int grid = config.repairGridSlotCount();
             Bukkit.getScheduler().runTask(plugin, () -> messageService.send(
                     player,
                     "slots.info",
-                    "base_slots",
-                    String.valueOf(base),
+                    "tier_slots",
+                    String.valueOf(tier),
                     "purchased_slots",
                     String.valueOf(purchased),
                     "max_purchased",
                     String.valueOf(maxPurchased),
                     "total_slots",
-                    String.valueOf(total)
+                    String.valueOf(total),
+                    "grid_slots",
+                    String.valueOf(grid)
             ));
         });
         return Command.SINGLE_SUCCESS;
@@ -130,11 +142,7 @@ public final class SoulFixCommandRegistrar {
             return 0;
         }
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        runtime.slotService().addPurchasedSlots(
-                target.getUniqueId(),
-                amount,
-                config.repairGridSlotCount()
-        ).thenAccept(profile ->
+        runtime.slotService().addPurchasedSlots(target, amount).thenAccept(profile ->
                 Bukkit.getScheduler().runTask(plugin, () -> messageService.send(
                         context.getSource().getSender(),
                         "admin.giveslots",
@@ -189,6 +197,11 @@ public final class SoulFixCommandRegistrar {
 
     private int usage(CommandContext<CommandSourceStack> context) {
         messageService.send(context.getSource().getSender(), "admin.usage");
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int setup(CommandContext<CommandSourceStack> context) {
+        messageService.sendLines(context.getSource().getSender(), "admin.setup");
         return Command.SINGLE_SUCCESS;
     }
 

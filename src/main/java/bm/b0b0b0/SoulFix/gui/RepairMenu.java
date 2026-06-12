@@ -127,6 +127,11 @@ public final class RepairMenu implements InventoryHolder {
         if (isAnimating()) {
             return;
         }
+        if (!isEditableSlot(rawSlot) && !purchasableBarrierSlots.contains(rawSlot)) {
+            if (explainLockedSlot(rawSlot)) {
+                return;
+            }
+        }
         String action = actionAt(rawSlot);
         if ("REPAIR".equals(action)) {
             startRepair();
@@ -234,7 +239,7 @@ public final class RepairMenu implements InventoryHolder {
     private void render(PlayerRepairProfile profile) {
         Map<Integer, ItemStack> saved = snapshotEditableSlots();
         inventory.clear();
-        fillDecorations(profile);
+        fillRepairGrid(profile, saved);
         fillButtons(profile);
         fillFrameFiller();
         if (!repairService.isAnimating(player.getUniqueId())) {
@@ -261,32 +266,134 @@ public final class RepairMenu implements InventoryHolder {
         }
     }
 
-    private void fillDecorations(PlayerRepairProfile profile) {
-        List<Integer> ordered = config.gui().repairSlots;
-        int allowed = Math.min(totalSlots, ordered.size());
-        List<Integer> active = GuiLayoutHelper.activeRepairSlots(ordered, allowed);
+    private void fillRepairGrid(PlayerRepairProfile profile, Map<Integer, ItemStack> saved) {
         editableSlots.clear();
-        editableSlots.addAll(active);
-        Set<Integer> activeSet = new HashSet<>(active);
         purchasableBarrierSlots.clear();
         long cooldownSeconds = cooldownService.remainingSeconds(player.getUniqueId(), profile.cooldownUntilEpochMs());
-        String[] pairs = guiPairs(profile, cooldownSeconds);
+        String[] basePairs = guiPairs(profile, cooldownSeconds);
         boolean canBuyMore = canBuyMore(profile);
-        GuiFixSettings.GuiElementSettings locked = config.gui().repairElements.get("locked-slot");
-        GuiFixSettings.GuiElementSettings lockedMax = config.gui().repairElements.get("locked-max");
-        GuiFixSettings.GuiElementSettings barrierElement = canBuyMore ? locked : lockedMax;
-        for (int slot : ordered) {
-            if (!activeSet.contains(slot)) {
-                purchasableBarrierSlots.add(slot);
-                inventory.setItem(slot, itemFactory.build(player, barrierElement, pairs));
+        int purchaseRow = config.purchaseRowIndex();
+        GuiFixSettings.GuiElementSettings slotBarrier = requireElement("slot-barrier");
+        GuiFixSettings.GuiElementSettings rowBarrier = requireElement("row-barrier");
+        GuiFixSettings.GuiElementSettings buySlot = requireElement("buy-slot");
+        GuiFixSettings.GuiElementSettings purchaseLimit = requireElement("purchase-limit");
+
+        for (int row = 0; row < config.gui().repairRows.size(); row++) {
+            List<Integer> slots = config.repairRow(row);
+            if (row == purchaseRow) {
+                fillPurchaseRow(slots, saved, profile, canBuyMore, buySlot, slotBarrier, purchaseLimit, basePairs);
+                continue;
             }
+            if (slotService.isRowUnlocked(player, row)) {
+                for (int slot : slots) {
+                    editableSlots.add(slot);
+                    restoreSlotItem(slot, saved);
+                }
+                continue;
+            }
+            fillLockedPrivilegeRow(row, slots, rowBarrier, basePairs);
         }
-        GuiFixSettings.GuiElementSettings info = config.gui().repairElements.get("info");
-        inventory.setItem(info.slot, itemFactory.build(player, info, pairs));
+    }
+
+    private void fillLockedPrivilegeRow(
+            int row,
+            List<Integer> slots,
+            GuiFixSettings.GuiElementSettings rowBarrier,
+            String[] basePairs
+    ) {
+        String rank = messageService.raw(player, slotService.rankLangKeyForRow(row));
+        String[] pairs = withPairs(basePairs, "rank", rank);
+        ItemStack item = itemFactory.build(player, rowBarrier, pairs);
+        for (int slot : slots) {
+            inventory.setItem(slot, item);
+        }
+    }
+
+    private void fillPurchaseRow(
+            List<Integer> slots,
+            Map<Integer, ItemStack> saved,
+            PlayerRepairProfile profile,
+            boolean canBuyMore,
+            GuiFixSettings.GuiElementSettings buySlot,
+            GuiFixSettings.GuiElementSettings slotBarrier,
+            GuiFixSettings.GuiElementSettings purchaseLimit,
+            String[] basePairs
+    ) {
+        int unlocked = slotService.unlockedInPurchaseRow(profile);
+        int bought = profile.purchasedSlots();
+        int buyCap = slotService.maxBuyableSlots(player);
+        for (int index = 0; index < slots.size(); index++) {
+            int slot = slots.get(index);
+            if (index < unlocked) {
+                editableSlots.add(slot);
+                restoreSlotItem(slot, saved);
+                continue;
+            }
+            if (index == unlocked && bought < buyCap) {
+                if (canBuyMore) {
+                    purchasableBarrierSlots.add(slot);
+                }
+                inventory.setItem(slot, itemFactory.build(player, buySlot, basePairs));
+                continue;
+            }
+            if (bought >= buyCap) {
+                inventory.setItem(slot, itemFactory.build(player, purchaseLimit, basePairs));
+                continue;
+            }
+            inventory.setItem(slot, itemFactory.build(player, slotBarrier, basePairs));
+        }
+    }
+
+    private GuiFixSettings.GuiElementSettings requireElement(String key) {
+        GuiFixSettings.GuiElementSettings element = config.gui().repairElements.get(key);
+        if (element == null) {
+            throw new IllegalStateException("Missing gui repair element: " + key);
+        }
+        return element;
+    }
+
+    private String[] withPairs(String[] basePairs, String... extra) {
+        List<String> values = new ArrayList<>(List.of(basePairs));
+        values.addAll(List.of(extra));
+        return values.toArray(String[]::new);
+    }
+
+    private void restoreSlotItem(int slot, Map<Integer, ItemStack> saved) {
+        ItemStack savedItem = saved.get(slot);
+        if (savedItem != null) {
+            inventory.setItem(slot, savedItem);
+            return;
+        }
+        inventory.setItem(slot, null);
+    }
+
+    private boolean explainLockedSlot(int rawSlot) {
+        int purchaseRow = config.purchaseRowIndex();
+        for (int row = 0; row < purchaseRow; row++) {
+            if (!config.repairRow(row).contains(rawSlot)) {
+                continue;
+            }
+            if (slotService.isRowUnlocked(player, row)) {
+                return false;
+            }
+            String rank = messageService.raw(player, slotService.rankLangKeyForRow(row));
+            messageService.send(
+                    player,
+                    "repair.row-locked",
+                    "rank",
+                    rank
+            );
+            return true;
+        }
+        if (config.purchaseRowSlots().contains(rawSlot) && !purchasableBarrierSlots.contains(rawSlot)) {
+            messageService.send(player, "repair.purchase-blocked");
+            return true;
+        }
+        return false;
     }
 
     private boolean canBuyMore(PlayerRepairProfile profile) {
-        return profile.purchasedSlots() < slotService.maxPurchasableSlots(player) && purchaseService.isShopAvailable();
+        return profile.purchasedSlots() < slotService.maxBuyableSlots(player) && purchaseService.isShopAvailable();
     }
 
     private void fillFrameFiller() {
@@ -294,10 +401,13 @@ public final class RepairMenu implements InventoryHolder {
         for (int slot : config.gui().repairTopFillers) {
             inventory.setItem(slot, itemFactory.filler(player, border));
         }
-        for (int slot : config.gui().repairBottomFillers) {
+        for (int slot : config.gui().repairBottomDecor) {
             inventory.setItem(slot, itemFactory.filler(player, border));
         }
         for (int slot : GuiLayoutHelper.frameSlots(config.gui().repairSize)) {
+            if (config.gui().repairBottomDecor.contains(slot)) {
+                continue;
+            }
             ItemStack current = inventory.getItem(slot);
             if (current != null && !current.getType().isAir()) {
                 continue;
@@ -309,11 +419,10 @@ public final class RepairMenu implements InventoryHolder {
     private void fillButtons(PlayerRepairProfile profile) {
         long cooldownSeconds = cooldownService.remainingSeconds(player.getUniqueId(), profile.cooldownUntilEpochMs());
         String[] pairs = guiPairs(profile, cooldownSeconds);
-        int remaining = Math.max(0, slotService.maxPurchasableSlots(player) - profile.purchasedSlots());
+        int remaining = Math.max(0, slotService.maxBuyableSlots(player) - profile.purchasedSlots());
         for (Map.Entry<Integer, String> entry : actions.entrySet()) {
             if ("DECORATION".equals(entry.getValue())
-                    || "BUY_SLOT".equals(entry.getValue())
-                    || "INFO".equals(entry.getValue())) {
+                    || "BUY_SLOT".equals(entry.getValue())) {
                 continue;
             }
             GuiFixSettings.GuiElementSettings element = findElement(entry.getValue());
@@ -332,11 +441,15 @@ public final class RepairMenu implements InventoryHolder {
             case "BUY_MAX" -> remaining;
             default -> 1;
         };
-        if ("BUY_MAX".equals(action)) {
-            amount = remaining;
-        }
         double cost = economyManager.totalCost(purchased, Math.max(0, amount));
-        List<String> values = new ArrayList<>(List.of(basePairs));
+        List<String> values = new ArrayList<>();
+        for (int index = 0; index + 1 < basePairs.length; index += 2) {
+            if ("cost".equals(basePairs[index])) {
+                continue;
+            }
+            values.add(basePairs[index]);
+            values.add(basePairs[index + 1]);
+        }
         values.add("amount");
         values.add(String.valueOf(amount));
         values.add("cost");
@@ -348,12 +461,14 @@ public final class RepairMenu implements InventoryHolder {
         return new String[]{
                 "currency", economyManager.currencyLabel(),
                 "cost", economyManager.formatCost(economyManager.nextSlotCost(profile.purchasedSlots())),
+                "balance", economyManager.formatBalance(player.getUniqueId()),
                 "provider", economyManager.activeProviderId(),
                 "purchased", String.valueOf(profile.purchasedSlots()),
-                "max_purchased", String.valueOf(slotService.maxPurchasableSlots(player)),
-                "base_slots", String.valueOf(slotService.baseSlots(player)),
+                "max_purchased", String.valueOf(slotService.maxBuyableSlots(player)),
+                "tier_slots", String.valueOf(slotService.unlockedPermissionRowSlots(player)),
                 "purchased_slots", String.valueOf(profile.purchasedSlots()),
                 "total_slots", String.valueOf(totalSlots),
+                "grid_slots", String.valueOf(config.repairGridSlotCount()),
                 "cooldown_remaining", cooldownSeconds <= 0 ? "нет" : cooldownSeconds + "с"
         };
     }

@@ -52,20 +52,40 @@ public final class PluginConfig {
         return main.permissions.bypassCooldown;
     }
 
-    public Map<String, Integer> slotTiers() {
-        return main.slots.permissionTiers;
+    public List<String> rowUnlockPermissions() {
+        return main.slots.rowUnlockPermissions;
     }
 
     public Map<String, Integer> purchaseLimitTiers() {
         return main.slots.purchaseLimitTiers;
     }
 
-    public int slotRowSize() {
-        return main.slots.rowSize;
+    public Map<String, String> rowRankKeys() {
+        return main.slots.rowRankKeys;
+    }
+
+    public int freePurchaseRowSlots() {
+        return main.slots.freePurchaseRowSlots;
+    }
+
+    public int purchaseRowBuyCap() {
+        return Math.max(0, purchaseRowSlots().size() - freePurchaseRowSlots());
+    }
+
+    public int purchaseRowIndex() {
+        return gui.repairRows.size() - 1;
+    }
+
+    public List<Integer> repairRow(int index) {
+        return gui.repairRows.get(index);
+    }
+
+    public List<Integer> purchaseRowSlots() {
+        return gui.repairRows.get(purchaseRowIndex());
     }
 
     public int repairGridSlotCount() {
-        return gui.repairSlots.size();
+        return gui.repairRows.stream().mapToInt(List::size).sum();
     }
 
     public String economyMode() {

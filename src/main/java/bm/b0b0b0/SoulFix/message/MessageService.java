@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public final class MessageService {
@@ -72,5 +73,16 @@ public final class MessageService {
 
     public void reload() {
         loader.load();
+    }
+
+    public String raw(Player player, String key) {
+        return loader.raw(locale(player), key);
+    }
+
+    public void sendLines(CommandSender sender, String key) {
+        String locale = sender instanceof Player player ? locale(player) : loader.defaultLocale();
+        for (String line : loader.lore(locale, key)) {
+            sender.sendMessage(HexColorParser.parse(line));
+        }
     }
 }
